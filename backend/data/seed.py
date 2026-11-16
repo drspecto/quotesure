@@ -8,11 +8,12 @@ to re-run any time the data gets messy.
 """
 import csv
 import random
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from app import models
 from app.database import Base, SessionLocal, engine
+from app.services.cost_engine import CostSettings, OrderInput, calculate
 
 # Same "random" numbers every run, so the demo always looks the same
 random.seed(42)
@@ -139,10 +140,34 @@ def seed():
                     purchase_count += 1
                     day += random.randint(7, 14)
 
+        # 6. Open customer quotations, made ~3-4 weeks ago at THAT day's prices.
+        #    Prices have moved since, so later the alerts can catch quotes that
+        #    became loss-making. (customer, part, material index, qty, kg/pc,
+        #    machine h/pc, labour h/pc, days ago, price per piece quoted)
+        settings = CostSettings(150.0, 400.0, 120.0, 8.0, 12.0, 15.0)
+        QUOTES = [
+            ("Deccan Auto Components", "Mounting bracket", 0, 2000, 0.8, 0.05, 0.08, 28, 104.0),
+            ("Shivneri Pumps", "Pump shaft", 1, 500, 2.4, 0.25, 0.20, 25, 397.0),
+            ("Sahyadri Agro Equipment", "SS hopper panel", 2, 150, 6.5, 0.40, 0.60, 21, 2290.0),
+        ]
+        for cust, part, m_idx, qty, kg, mh, lh, days_ago, per_piece in QUOTES:
+            d, price_then = history[m_idx][DAYS_OF_HISTORY - days_ago]
+            cost = calculate(OrderInput(qty, kg, price_then, mh, lh), settings)
+            db.add(models.Quotation(
+                customer_name=cust, part_name=part,
+                material_id=material_rows[m_idx].id, quantity=qty,
+                weight_per_piece_kg=kg, machine_hours_per_piece=mh, labour_hours_per_piece=lh,
+                material_price_used=price_then, total_cost=cost.total_cost,
+                quoted_price=round(per_piece * qty, 2), status="open",
+                created_at=datetime.combine(d, datetime.min.time()),
+                valid_until=d + timedelta(days=45),
+            ))
+
         db.commit()
         print(f"✅ Seeded: 1 factory, {len(MATERIALS)} materials, "
               f"{len(MATERIALS) * (DAYS_OF_HISTORY + 1)} price points, "
-              f"{len(SUPPLIERS)} suppliers, {purchase_count} purchases")
+              f"{len(SUPPLIERS)} suppliers, {purchase_count} purchases, "
+              f"{len(QUOTES)} open quotations")
         print(f"✅ Wrote {CSV_PATH.name}")
     finally:
         db.close()
