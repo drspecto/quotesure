@@ -3,7 +3,7 @@ from fastapi import FastAPI
 
 from app import models  # noqa: F401  (importing registers the tables)
 from app.database import Base, engine
-from app.routers import prices, quoting, settings, suppliers
+from app.routers import buying, prices, quoting, settings, suppliers
 
 # Creates all tables in quotesure.db if they don't exist yet
 Base.metadata.create_all(bind=engine)
@@ -19,6 +19,7 @@ app.include_router(prices.router)
 app.include_router(suppliers.router)
 app.include_router(settings.router)
 app.include_router(quoting.router)
+app.include_router(buying.router)
 
 
 @app.get("/", tags=["Health"])

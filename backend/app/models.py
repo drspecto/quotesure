@@ -78,10 +78,12 @@ class SupplierQuote(Base):
 
     id = Column(Integer, primary_key=True)
     supplier_id = Column(Integer, ForeignKey("suppliers.id"), nullable=True)
+    supplier_name = Column(String, default="")    # name as written on the quote
     file_name = Column(String, default="")
     created_at = Column(DateTime, default=datetime.now)
     verdict = Column(String, default="pending")   # fair / overpriced / good_deal / pending
     summary = Column(Text, default="")            # short explanation shown to the owner
+    potential_saving = Column(Float, default=0)   # ₹ saved if items were at a fair price
     negotiation_message = Column(Text, default="")
 
     supplier = relationship("Supplier")

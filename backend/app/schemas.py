@@ -144,3 +144,49 @@ class QuotationOut(BaseModel):
     today_material_price: float | None
     today_total_cost: float | None
     today_profit: float | None
+
+
+# ---------- Supplier quote checking ----------
+
+class QuoteItemIn(BaseModel):
+    """One line of a supplier quote, typed in by hand (no AI needed)."""
+    description: str = Field(examples=["MS CR Sheet 2mm"])
+    material_id: int | None = Field(default=None, examples=[1])
+    quantity_kg: float = Field(gt=0, examples=[500])
+    price_per_kg: float = Field(gt=0, examples=[72.0])
+
+
+class CheckItemsRequest(BaseModel):
+    supplier_id: int | None = Field(default=None, examples=[1])
+    items: list[QuoteItemIn] = Field(min_length=1)
+
+
+class QuoteItemResult(BaseModel):
+    description: str
+    material_id: int | None
+    material_name: str | None
+    quantity_kg: float
+    price_per_kg: float
+    market_price: float | None
+    difference_percent: float | None
+    fair_price: float | None
+    potential_saving: float
+    last_paid_price: float | None
+    last_paid_supplier: str | None
+    best_supplier: str | None
+    best_supplier_markup: float | None
+    verdict: str
+
+
+class QuoteCheckOut(BaseModel):
+    id: int
+    supplier_id: int | None
+    supplier_name: str
+    file_name: str
+    created_at: datetime
+    verdict: str
+    summary: str
+    potential_saving: float
+    negotiation_message: str
+    ai_notes: str = ""           # what the AI couldn't read, if anything
+    items: list[QuoteItemResult]

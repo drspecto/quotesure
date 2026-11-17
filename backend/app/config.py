@@ -10,3 +10,6 @@ load_dotenv(ROOT_DIR / ".env")
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./quotesure.db")
+
+# Which Gemini model to use. Change it in .env if Google retires this one.
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
