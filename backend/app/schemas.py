@@ -190,3 +190,16 @@ class QuoteCheckOut(BaseModel):
     negotiation_message: str
     ai_notes: str = ""           # what the AI couldn't read, if anything
     items: list[QuoteItemResult]
+
+
+# ---------- Alerts ----------
+
+class AlertOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    type: str
+    message: str
+    quotation_id: int | None
+    created_at: datetime
+    is_read: bool

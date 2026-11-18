@@ -46,6 +46,8 @@ def draft_message(supplier_name: str, check: QuoteCheck) -> str:
         f"raw-material supplier '{supplier_name or 'the supplier'}', asking for a price revision. "
         "Tone: respectful, friendly, firm. Mention that they are a regular customer. "
         "Use simple English (a few common Hindi words like 'ji' are fine). Under 90 words. "
+        "Say only that these rates are above the current market rate. Do NOT claim that "
+        "prices have dropped or risen, and do not invent any other reasons. "
         "Use EXACTLY these numbers, do not change or add any:\n" + "\n".join(lines)
     )
     try:

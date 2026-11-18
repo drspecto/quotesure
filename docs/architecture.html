@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1600px; background: #ffffff; font-family: Inter, "Helvetica Neue", Arial, sans-serif; color: #172033; }
+  .frame { padding: 40px 48px 36px; }
+  h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.3px; }
+  .sub { font-size: 17px; color: #5b6478; margin-top: 6px; }
+  .grid { display: grid; grid-template-columns: 270px 1fr 300px; gap: 36px; margin-top: 30px; }
+  .col-title { font-size: 13px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #7a8399; margin-bottom: 12px; }
+  .card { border: 1.5px solid #d5dae4; border-radius: 12px; padding: 14px 16px; background: #fff; }
+  .card + .card { margin-top: 14px; }
+  .card b { display: block; font-size: 16px; margin-bottom: 4px; }
+  .card span { font-size: 14px; color: #5b6478; line-height: 1.4; }
+  .backend { border: 2px solid #2f5bd3; border-radius: 16px; padding: 18px 20px 20px; background: #f6f8ff; position: relative; }
+  .backend-title { font-size: 15px; font-weight: 700; color: #2f5bd3; margin-bottom: 14px; }
+  .flow { display: flex; align-items: stretch; gap: 0; margin-bottom: 14px; }
+  .step { flex: 1; border-radius: 10px; padding: 11px 13px; background: #fff; border: 1.5px solid #c7d2f0; }
+  .step b { display: block; font-size: 15px; }
+  .step span { font-size: 13px; color: #5b6478; line-height: 1.35; }
+  .ai { border-color: #8b5cf6; background: #faf7ff; }
+  .ai b::before { content: "AI · "; color: #7c3aed; }
+  .py b::before { content: "Python · "; color: #2f5bd3; }
+  .arrow { width: 28px; display: flex; align-items: center; justify-content: center; color: #8a93a8; font-size: 22px; }
+  .flow-label { font-size: 12.5px; font-weight: 700; color: #2f5bd3; margin: 2px 0 6px; letter-spacing: .4px; }
+  .planned { border-style: dashed; opacity: .75; }
+  .db { margin-top: 16px; border: 1.5px solid #9aa6bd; border-radius: 12px; padding: 12px 16px; background: #fff; display: flex; gap: 18px; align-items: center; }
+  .db b { font-size: 15px; white-space: nowrap; }
+  .db span { font-size: 13.5px; color: #5b6478; }
+  .out { border-left: 4px solid #16a34a; }
+  .rule { margin-top: 22px; display: flex; justify-content: space-between; align-items: center; }
+  .principle { font-size: 16px; background: #172033; color: #fff; padding: 10px 18px; border-radius: 999px; }
+  .legend { font-size: 13.5px; color: #5b6478; display: flex; gap: 18px; }
+  .sw { display: inline-block; width: 22px; height: 12px; border-radius: 3px; vertical-align: middle; margin-right: 6px; }
+</style></head>
+<body><div class="frame">
+  <h1>QuoteSure: how it works</h1>
+  <div class="sub">An AI assistant that helps small factories buy raw material at a fair price and never quote an order at a loss</div>
+
+  <div class="grid">
+    <div>
+      <div class="col-title">Owner sends</div>
+      <div class="card"><b>Supplier quote</b><span>Phone photo, PDF or handwritten note, in English or Hinglish</span></div>
+      <div class="card"><b>Customer enquiry</b><span>Part, material, quantity, weight, machine and labour time</span></div>
+      <div class="card"><b>Factory settings (once)</b><span>Labour and machine rates, power, scrap %, overhead, target margin</span></div>
+    </div>
+
+    <div>
+      <div class="col-title">QuoteSure (FastAPI + web dashboard)</div>
+      <div class="backend">
+        <div class="flow-label">1 · BUY RIGHT: check supplier quotes</div>
+        <div class="flow">
+          <div class="step ai"><b>Quote reader</b><span>Gemini reads the image or PDF, converts to ₹/kg, matches materials</span></div>
+          <div class="arrow">→</div>
+          <div class="step py"><b>Price checker</b><span>Compares with market price, last price paid and cheapest supplier</span></div>
+          <div class="arrow">→</div>
+          <div class="step ai"><b>Negotiation draft</b><span>Polite WhatsApp message using Python's target prices</span></div>
+        </div>
+
+        <div class="flow-label">2 · QUOTE RIGHT: price customer orders</div>
+        <div class="flow">
+          <div class="step py"><b>Cost engine</b><span>Material + scrap + machine + power + labour + overhead (unit-tested)</span></div>
+          <div class="arrow">→</div>
+          <div class="step py"><b>Price check</b><span>Safe price, loss warning, +10% material risk</span></div>
+          <div class="arrow">→</div>
+          <div class="step py"><b>Quotation PDF</b><span>With a price-validity clause</span></div>
+        </div>
+
+        <div class="flow-label">3 · STAY SAFE: watch prices, and ask in plain words</div>
+        <div class="flow">
+          <div class="step py"><b>Price watch</b><span>Re-costs every open quote when material prices move</span></div>
+          <div class="arrow">→</div>
+          <div class="step ai"><b>Agent + chat</b><span>Owner asks in plain words; the agent picks and calls 8 tools</span></div>
+        </div>
+
+        <div class="db"><b>SQLite database</b><span>Market prices (90 days) · suppliers · purchase history · supplier quotes · customer quotations · settings</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-title">Owner gets</div>
+      <div class="card out"><b>Verdict + saving</b><span>"Overpriced: MS bar is 12% above market. Fair price saves ₹4,663."</span></div>
+      <div class="card out"><b>Ready-to-send message</b><span>Negotiation text with exact target rates</span></div>
+      <div class="card out"><b>Safe price</b><span>"₹120/pc loses ₹24,553. Quote ₹194.47/pc."</span></div>
+      <div class="card out"><b>Quotation PDF</b><span>Professional quote for the customer</span></div>
+      <div class="card out"><b>Price alerts</b><span>"Quote Q-0002 now loses ₹4,332. Revise it."</span></div>
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="principle">AI reads documents and writes words. Python calculates every number.</div>
+    <div class="legend">
+      <span><i class="sw" style="background:#faf7ff;border:1.5px solid #8b5cf6"></i>AI step (Gemini)</span>
+      <span><i class="sw" style="background:#fff;border:1.5px solid #c7d2f0"></i>Python step</span>
+          </div>
+  </div>
+</div></body></html>

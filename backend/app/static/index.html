@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuoteSure</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 30 30%27%3E%3Crect width=%2730%27 height=%277%27 rx=%272%27 fill=%27%231D3557%27/%3E%3Crect y=%2711%27 width=%2722%27 height=%277%27 rx=%272%27 fill=%27%231D3557%27/%3E%3Crect y=%2722%27 width=%2714%27 height=%277%27 rx=%272%27 fill=%27%23F08A4B%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div>
+        <div class="brand-name">QuoteSure</div>
+        <div class="brand-factory" id="factory-name"></div>
+      </div>
+    </div>
+    <nav aria-label="Main">
+      <a href="#overview" data-view="overview">Overview</a>
+      <a href="#check" data-view="check">Check a supplier quote</a>
+      <a href="#price" data-view="price">Price an order</a>
+      <a href="#ask" data-view="ask">Ask QuoteSure</a>
+    </nav>
+    <p class="sidebar-note">Market prices in this demo are simulated. Reset everything with <code>python -m data.seed</code>.</p>
+  </aside>
+
+  <main>
+    <!-- OVERVIEW -->
+    <section id="view-overview" class="view">
+      <header class="view-head">
+        <h1>Overview</h1>
+        <p>What you’ve paid, what you’ve quoted, and what needs attention today.</p>
+      </header>
+
+      <div class="figures">
+        <div class="figure figure-loss">
+          <div class="figure-value" id="fig-overpaid">–</div>
+          <div class="figure-label">paid above a fair price in the last 90 days</div>
+          <div class="figure-note" id="fig-overpaid-note"></div>
+        </div>
+        <div class="figure">
+          <div class="figure-value" id="fig-risk">–</div>
+          <div class="figure-label">open customer quotes at risk at today’s prices</div>
+        </div>
+        <div class="figure">
+          <div class="figure-value" id="fig-alerts">–</div>
+          <div class="figure-label">unread alerts</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Alerts</h2>
+          <div class="panel-actions">
+            <button class="btn ghost" id="btn-watch">Re-check open quotes</button>
+            <button class="btn" id="btn-spike">Simulate a 15% rise in MS Round Bar</button>
+          </div>
+        </div>
+        <ul class="alerts" id="alerts"></ul>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <h2>Suppliers</h2>
+          <p class="panel-sub">Average price paid above market, per supplier</p>
+          <table class="table" id="suppliers-table">
+            <thead><tr><th>Supplier</th><th>City</th><th class="num">Buys</th><th>Above market</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Market price</h2>
+            <label class="inline-select">
+              <span class="sr-only">Material</span>
+              <select id="chart-material"></select>
+            </label>
+          </div>
+          <p class="panel-sub" id="chart-sub"></p>
+          <div id="chart" class="chart"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Open customer quotes</h2>
+        <p class="panel-sub">Profit when quoted, and the same order costed at today’s material price</p>
+        <table class="table" id="quotes-table">
+          <thead><tr><th>Quote</th><th>Customer</th><th>Part</th><th class="num">Qty</th><th class="num">Quoted</th><th class="num">Profit then</th><th class="num">Profit today</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CHECK A SUPPLIER QUOTE -->
+    <section id="view-check" class="view" hidden>
+      <header class="view-head">
+        <h1>Check a supplier quote</h1>
+        <p>Upload a photo or PDF of the quote. QuoteSure reads it, checks every rate against the market and your own history, and drafts a reply.</p>
+      </header>
+
+      <div class="panel">
+        <form id="check-form" class="upload">
+          <label class="drop" id="drop">
+            <input type="file" id="check-file" accept="image/png,image/jpeg,image/webp,application/pdf">
+            <span class="drop-title" id="drop-title">Choose a quote, or drop it here</span>
+            <span class="drop-sub">PNG, JPG, WEBP or PDF, up to 10 MB</span>
+          </label>
+          <div class="upload-side">
+            <label class="field">
+              <span>Supplier (optional)</span>
+              <select id="check-supplier"><option value="">Read it from the quote</option></select>
+            </label>
+            <button class="btn big" type="submit" id="check-btn">Check this quote</button>
+          </div>
+        </form>
+        <div class="samples">
+          <span>Or try a sample:</span>
+          <button class="chip" data-sample="1_sharma_steel_overpriced.png">Typed quote</button>
+          <button class="chip" data-sample="5_sharma_handwritten_photo.jpg">Handwritten photo</button>
+          <button class="chip" data-sample="4_shree_polymers_per_tonne.png">Priced per tonne</button>
+          <button class="chip" data-sample="3_bharat_alloys_good_deal.pdf">PDF</button>
+          <button class="chip" data-sample="2_om_sai_fair.png">Fair quote</button>
+        </div>
+      </div>
+
+      <div id="check-result"></div>
+    </section>
+
+    <!-- PRICE AN ORDER -->
+    <section id="view-price" class="view" hidden>
+      <header class="view-head">
+        <h1>Price an order</h1>
+        <p>Enter the order. QuoteSure works out its true cost at today’s material price and the lowest safe price to quote.</p>
+      </header>
+
+      <div class="two-col wide-left">
+        <form class="panel form" id="price-form">
+          <label class="field"><span>Material</span><select id="p-material" required></select></label>
+          <div class="field-row">
+            <label class="field"><span>Quantity (pieces)</span><input type="number" id="p-qty" min="1" step="1" value="500" required></label>
+            <label class="field"><span>Finished weight per piece (kg)</span><input type="number" id="p-weight" min="0.001" step="any" value="1.2" required></label>
+          </div>
+          <div class="field-row">
+            <label class="field"><span>Machine time per piece (hours)</span><input type="number" id="p-machine" min="0" step="any" value="0.1"></label>
+            <label class="field"><span>Labour time per piece (hours)</span><input type="number" id="p-labour" min="0" step="any" value="0.1"></label>
+          </div>
+          <label class="field"><span>The price you were going to quote, per piece (optional)</span><input type="number" id="p-owner" min="0" step="any" value="120" placeholder="₹"></label>
+          <button class="btn big" type="submit">Work out the cost</button>
+        </form>
+        <div id="price-result" class="price-result">
+          <div class="empty">Your cost breakdown will appear here.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ASK -->
+    <section id="view-ask" class="view" hidden>
+      <header class="view-head">
+        <h1>Ask QuoteSure</h1>
+        <p>Ask in your own words. The assistant looks up prices, suppliers and quotes itself, and shows each step it took.</p>
+      </header>
+      <div class="panel chat-panel">
+        <div class="chat" id="chat" aria-live="polite">
+          <div class="suggestions" id="suggestions">
+            <button class="chip">Is Sharma Steel charging me fairly?</button>
+            <button class="chip">Which of my open quotes are losing money now?</button>
+            <button class="chip">Price 300 pump shafts in MS round bar, 2.4 kg each, 0.25 h machine and 0.2 h labour</button>
+            <button class="chip">Sharma quoted MS sheet at ₹72/kg for 500 kg. Should I accept?</button>
+          </div>
+        </div>
+        <form class="chat-form" id="chat-form">
+          <label class="sr-only" for="chat-input">Your question</label>
+          <input id="chat-input" autocomplete="off" placeholder="Ask about suppliers, prices or quotes">
+          <button class="btn" type="submit">Send</button>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>
